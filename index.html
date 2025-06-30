@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attendance & Meals Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h2 contenteditable="true" id="editableHeader">Monthly Attendance and Meal Tracker</h2>
+
+  <label>Select Month: <input type="month" id="monthPicker" /></label>
+
+  <label>Choose Table Style:
+    <select id="themeSelector">
+      <option value="default">Default</option>
+      <option value="blue">Blue</option>
+      <option value="dark">Dark</option>
+      <option value="minimal">Minimal</option>
+    </select>
+  </label>
+
+  <button onclick="exportToPDF()">📄 Export to PDF</button>
+  <button onclick="resetForm()">🔄 Reset</button>
+
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th class="sno">Sno</th>
+        <th class="date">Date</th>
+        <th>Attendance</th>
+        <th class="meal">Meals Amount</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="total" id="totalMeals">Total Meals Amount = 0</div>
+  <div class="total">
+    Total Combo Off = <span contenteditable="true" id="comboOff">0</span>
+  </div>
+
+  <!-- jsPDF and Plugins -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>
