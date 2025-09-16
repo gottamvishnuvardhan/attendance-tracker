@@ -1,20 +1,18 @@
 const monthPicker = document.getElementById("monthPicker");
 const tableBody = document.querySelector("#attendanceTable tbody");
-const totalMealsInput = document.getElementById("totalMealsInput");
 const themeSelector = document.getElementById("themeSelector");
+const totalMealsDiv = document.getElementById("totalMealsDiv");
 
-// Flag to track manual edits
-let userEditedTotal = false;
+let userEditedTotal = false; // track manual edits
+
+// Track manual edits in the div
+totalMealsDiv.addEventListener("input", () => {
+  userEditedTotal = true;
+});
 
 monthPicker.addEventListener("change", generateTable);
 themeSelector.addEventListener("change", () => {
   document.body.className = themeSelector.value;
-});
-
-// Track manual edits
-totalMealsInput.addEventListener("input", function() {
-  userEditedTotal = true;
-  console.log("User set total meals =", this.value);
 });
 
 function generateTable() {
@@ -26,7 +24,7 @@ function generateTable() {
   while (date.getMonth() == month - 1) {
     const day = date.getDate();
     const weekday = date.toLocaleString("en-US", { weekday: "long" });
-    const formattedDate = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
+    const formattedDate = `${String(day).padStart(2,'0')}-${String(month).padStart(2,'0')}-${year}`;
     const isSunday = weekday === "Sunday";
     const attendance = isSunday ? "Week Off (Sunday)" : "Present";
     const meals = isSunday ? 0 : 90;
@@ -58,24 +56,18 @@ function updateTotalMeals() {
     total += value;
 
     const attnCell = tableBody.rows[index].cells[2];
-    const attnText = attnCell.textContent.trim().toLowerCase();
-    if (attnText === "present") {
-      presentDays++;
-    }
+    if (attnCell.textContent.trim().toLowerCase() === "present") presentDays++;
   });
 
-  // Only update total if user hasn't manually edited it
   if (!userEditedTotal) {
-    totalMealsInput.value = total;
+    totalMealsDiv.innerText = `Total Meals Amount = ${total} `;
   }
-
   document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
 }
 
 async function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-
   const header = document.getElementById("editableHeader").innerText;
 
   doc.setFontSize(18);
@@ -85,16 +77,10 @@ async function exportToPDF() {
     html: "#attendanceTable",
     startY: 25,
     theme: "grid",
-    headStyles: {
-      fillColor: [41, 128, 185],
-      halign: "center",
-    },
-    styles: {
-      fontSize: 10,
-      halign: "center",
-    },
+    headStyles: { fillColor: [41, 128, 185], halign: "center" },
+    styles: { fontSize: 10, halign: "center" },
     didDrawPage: function (data) {
-      const totalText = "Total Meals Amount = " + totalMealsInput.value;
+      const totalText = totalMealsDiv.innerText;
       const comboText = "Total Combo Off = " + document.getElementById("comboOff").innerText;
       doc.setFontSize(12);
       doc.text(totalText, 14, data.cursor.y + 10);
@@ -104,16 +90,14 @@ async function exportToPDF() {
 
   const [year, month] = monthPicker.value.split("-");
   const monthName = new Date(`${year}-${month}-01`).toLocaleString("default", { month: "long" });
-  const fileName = `${monthName} Attendance.pdf`;
-
-  doc.save(fileName);
+  doc.save(`${monthName} Attendance.pdf`);
 }
 
 function resetForm() {
   monthPicker.value = "";
   tableBody.innerHTML = "";
-  totalMealsInput.value = 0;
-  userEditedTotal = false; // reset manual edit flag
+  totalMealsDiv.innerText = "Total Meals Amount = 0 ";
+  userEditedTotal = false;
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
   document.body.className = "";
