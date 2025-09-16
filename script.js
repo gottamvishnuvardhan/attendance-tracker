@@ -44,18 +44,14 @@ function generateTable() {
 function updateTotalMeals() {
   const meals = document.querySelectorAll(".mealAmount");
   let total = 0;
-  let presentDays = 0;
 
-  meals.forEach((cell, index) => {
+  meals.forEach(cell => {
     const value = parseInt(cell.textContent.trim()) || 0;
     total += value;
-
-    const attnCell = tableBody.rows[index].cells[2];
-    if (attnCell.textContent.trim().toLowerCase() === "present") presentDays++;
   });
 
-  totalMealsValue.innerText = total; // dynamic sum
-  document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
+  // Update only the sum
+  totalMealsValue.innerText = total;
 }
 
 async function exportToPDF() {
@@ -91,7 +87,6 @@ function resetForm() {
   tableBody.innerHTML = "";
   document.getElementById("totalMealsLabel").innerText = "Total Meals Amount";
   totalMealsValue.innerText = "0";
-  document.getElementById("presentDays").textContent = "";
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
   document.body.className = "";
