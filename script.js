@@ -1,6 +1,6 @@
 const monthPicker = document.getElementById("monthPicker");
 const tableBody = document.querySelector("#attendanceTable tbody");
-const totalMealsDiv = document.getElementById("totalMeals");
+const totalMealsInput = document.getElementById("totalMealsInput");
 const themeSelector = document.getElementById("themeSelector");
 
 monthPicker.addEventListener("change", generateTable);
@@ -55,14 +55,19 @@ function updateTotalMeals() {
     }
   });
 
-  totalMealsDiv.textContent = `Total Meals Amount for ${presentDays} days = ${total}`;
+  if (!totalMealsInput.dataset.userEdited) {
+  totalMealsInput.value = total;}
 }
+totalMealsInput.addEventListener("input", () => {
+  totalMealsInput.dataset.userEdited = true;
+});
+
 
 async function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  const header = document.getElementById("editableHeader").innerText;
+  const totalText = "Total Meals Amount = " + totalMealsInput.value;
   doc.setFontSize(18);
   doc.text(header, 14, 15);
 
@@ -103,3 +108,4 @@ function resetForm() {
   document.body.className = "";
   themeSelector.value = "default";
 }
+
