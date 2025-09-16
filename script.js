@@ -1,12 +1,14 @@
 const monthPicker = document.getElementById("monthPicker");
 const tableBody = document.querySelector("#attendanceTable tbody");
 const themeSelector = document.getElementById("themeSelector");
-const totalMealsDiv = document.getElementById("totalMealsDiv");
+
+const totalMealsLabel = document.getElementById("totalMealsLabel");
+const totalMealsValue = document.getElementById("totalMealsValue");
 
 let userEditedTotal = false; // track manual edits
 
-// Track manual edits in the div
-totalMealsDiv.addEventListener("input", () => {
+// Track manual edits in the label
+totalMealsLabel.addEventListener("input", () => {
   userEditedTotal = true;
 });
 
@@ -59,9 +61,11 @@ function updateTotalMeals() {
     if (attnCell.textContent.trim().toLowerCase() === "present") presentDays++;
   });
 
+  // Update total only if user didn't manually edit the label
   if (!userEditedTotal) {
-    totalMealsDiv.innerText = `Total Meals Amount = ${total} `;
+    totalMealsValue.innerText = total;
   }
+
   document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
 }
 
@@ -80,7 +84,7 @@ async function exportToPDF() {
     headStyles: { fillColor: [41, 128, 185], halign: "center" },
     styles: { fontSize: 10, halign: "center" },
     didDrawPage: function (data) {
-      const totalText = totalMealsDiv.innerText;
+      const totalText = `${totalMealsLabel.innerText}${totalMealsValue.innerText}`;
       const comboText = "Total Combo Off = " + document.getElementById("comboOff").innerText;
       doc.setFontSize(12);
       doc.text(totalText, 14, data.cursor.y + 10);
@@ -96,7 +100,8 @@ async function exportToPDF() {
 function resetForm() {
   monthPicker.value = "";
   tableBody.innerHTML = "";
-  totalMealsDiv.innerText = "Total Meals Amount = 0 ";
+  totalMealsLabel.innerText = "Total Meals Amount = ";
+  totalMealsValue.innerText = "0";
   userEditedTotal = false;
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
