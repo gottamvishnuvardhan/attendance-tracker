@@ -55,12 +55,13 @@ function updateTotalMeals() {
     }
   });
 
-  if (!totalMealsInput.dataset.userEdited) {
-  totalMealsInput.value = total;}
+  // Update the input field with calculated value
+  const totalInput = document.getElementById("totalMealsInput");
+  totalInput.value = total;
+
+  // Update present days separately
+  document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
 }
-totalMealsInput.addEventListener("input", () => {
-  totalMealsInput.dataset.userEdited = true;
-});
 
 
 async function exportToPDF() {
@@ -68,6 +69,7 @@ async function exportToPDF() {
   const doc = new jsPDF();
 
   const totalText = "Total Meals Amount = " + totalMealsInput.value;
+
   doc.setFontSize(18);
   doc.text(header, 14, 15);
 
@@ -84,7 +86,7 @@ async function exportToPDF() {
       halign: "center",
     },
     didDrawPage: function (data) {
-      const totalText = document.getElementById("totalMeals").innerText;
+      const totalText = "Total Meals Amount = " + totalMealsInput.value;
       const comboText = "Total Combo Off = " + document.getElementById("comboOff").innerText;
       doc.setFontSize(12);
       doc.text(totalText, 14, data.cursor.y + 10);
@@ -102,10 +104,15 @@ async function exportToPDF() {
 function resetForm() {
   monthPicker.value = "";
   tableBody.innerHTML = "";
-  totalMealsDiv.textContent = "Total Meals Amount = 0";
+  totalMealsInput.value = 0;
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
   document.body.className = "";
   themeSelector.value = "default";
 }
+document.getElementById("totalMealsInput").addEventListener("input", function() {
+  console.log("User set total meals =", this.value);
+});
+
+
 
