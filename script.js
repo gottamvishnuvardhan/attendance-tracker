@@ -1,16 +1,7 @@
 const monthPicker = document.getElementById("monthPicker");
 const tableBody = document.querySelector("#attendanceTable tbody");
 const themeSelector = document.getElementById("themeSelector");
-
-const totalMealsLabel = document.getElementById("totalMealsLabel");
 const totalMealsValue = document.getElementById("totalMealsValue");
-
-let userEditedTotal = false; // track manual edits
-
-// Track manual edits in the label
-totalMealsLabel.addEventListener("input", () => {
-  userEditedTotal = true;
-});
 
 monthPicker.addEventListener("change", generateTable);
 themeSelector.addEventListener("change", () => {
@@ -40,12 +31,14 @@ function generateTable() {
     `;
     tableBody.appendChild(row);
 
+    // Update sum dynamically when meal cell is edited
+    row.querySelector(".mealAmount").addEventListener("input", updateTotalMeals);
+
     date.setDate(day + 1);
     sno++;
   }
 
-  updateTotalMeals();
-  tableBody.addEventListener("input", updateTotalMeals);
+  updateTotalMeals(); // initial sum
 }
 
 function updateTotalMeals() {
@@ -61,11 +54,7 @@ function updateTotalMeals() {
     if (attnCell.textContent.trim().toLowerCase() === "present") presentDays++;
   });
 
-  // Update total only if user didn't manually edit the label
-  if (!userEditedTotal) {
-    totalMealsValue.innerText = total;
-  }
-
+  totalMealsValue.innerText = total; // dynamic sum
   document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
 }
 
@@ -84,7 +73,7 @@ async function exportToPDF() {
     headStyles: { fillColor: [41, 128, 185], halign: "center" },
     styles: { fontSize: 10, halign: "center" },
     didDrawPage: function (data) {
-      const totalText = `${totalMealsLabel.innerText}${totalMealsValue.innerText}`;
+      const totalText = `${document.getElementById("totalMealsLabel").innerText} = ${totalMealsValue.innerText}`;
       const comboText = "Total Combo Off = " + document.getElementById("comboOff").innerText;
       doc.setFontSize(12);
       doc.text(totalText, 14, data.cursor.y + 10);
@@ -100,9 +89,9 @@ async function exportToPDF() {
 function resetForm() {
   monthPicker.value = "";
   tableBody.innerHTML = "";
-  totalMealsLabel.innerText = "Total Meals Amount = ";
+  document.getElementById("totalMealsLabel").innerText = "Total Meals Amount";
   totalMealsValue.innerText = "0";
-  userEditedTotal = false;
+  document.getElementById("presentDays").textContent = "";
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
   document.body.className = "";
