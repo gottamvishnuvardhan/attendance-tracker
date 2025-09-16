@@ -3,9 +3,18 @@ const tableBody = document.querySelector("#attendanceTable tbody");
 const totalMealsInput = document.getElementById("totalMealsInput");
 const themeSelector = document.getElementById("themeSelector");
 
+// Flag to track manual edits
+let userEditedTotal = false;
+
 monthPicker.addEventListener("change", generateTable);
 themeSelector.addEventListener("change", () => {
   document.body.className = themeSelector.value;
+});
+
+// Track manual edits
+totalMealsInput.addEventListener("input", function() {
+  userEditedTotal = true;
+  console.log("User set total meals =", this.value);
 });
 
 function generateTable() {
@@ -55,20 +64,19 @@ function updateTotalMeals() {
     }
   });
 
-  // Update the input field with calculated value
-  const totalInput = document.getElementById("totalMealsInput");
-  totalInput.value = total;
+  // Only update total if user hasn't manually edited it
+  if (!userEditedTotal) {
+    totalMealsInput.value = total;
+  }
 
-  // Update present days separately
   document.getElementById("presentDays").textContent = `(for ${presentDays} days)`;
 }
-
 
 async function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
 
-  const totalText = "Total Meals Amount = " + totalMealsInput.value;
+  const header = document.getElementById("editableHeader").innerText;
 
   doc.setFontSize(18);
   doc.text(header, 14, 15);
@@ -105,14 +113,9 @@ function resetForm() {
   monthPicker.value = "";
   tableBody.innerHTML = "";
   totalMealsInput.value = 0;
+  userEditedTotal = false; // reset manual edit flag
   document.getElementById("comboOff").innerText = "0";
   document.getElementById("editableHeader").innerText = "Monthly Attendance and Meal Tracker";
   document.body.className = "";
   themeSelector.value = "default";
 }
-document.getElementById("totalMealsInput").addEventListener("input", function() {
-  console.log("User set total meals =", this.value);
-});
-
-
-
